@@ -26,6 +26,7 @@ public class SClient {
 	boolean alive = true;
 	String name = null;
 	long id;
+	byte[] idbytes;
 	byte playcard = -1;
 	Deck currentCards;
 	int points = 0;
@@ -150,6 +151,7 @@ public class SClient {
 			e.printStackTrace();
 		}
 		this.id = System.currentTimeMillis() + 1;
+		idbytes = Packet.longToBytes(id);
 		this.parentServer = parent;
 		this.outpacks = new SPacketStackHandler(this);
 		

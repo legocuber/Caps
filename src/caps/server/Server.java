@@ -133,11 +133,11 @@ public class Server extends Thread {
 					byte topcard = cards.topcard();
 					
 					SClient c = ingame.get(index);
-					broadcast(pc_playerturn, Packet.longToBytes(c.id));
+					broadcast(pc_playerturn, c.idbytes);
 					Deck playable = c.currentCards.getPlayable(topcard);
 					updateCards(ingame, cards);
 					if (!c.canPlay(topcard, multiple)) {
-						broadcast(pc_playerpass, Packet.longToBytes(c.id));
+						broadcast(pc_playerpass, c.idbytes);
 					} else {
 						try {
 							if (c.currentCards.ncards <= 0) {
@@ -147,18 +147,20 @@ public class Server extends Thread {
 							}
 							if (cards.ncards == NULL) {
 								multiple = c.getMultiple();
+								if (multiple < 1) multiple = 1;
+								if (multiple > 3) multiple = 1;
 							}
 							byte cardindex = c.getCardindex(topcard, multiple, cards.ncards == 0);
 							if (cardindex == card_pass) {
-								broadcast(pc_playerpass, Packet.longToBytes(c.id));
+								broadcast(pc_playerpass, c.idbytes);
 							} else {
 								byte card = playable.cards[cardindex % playable.ncards];
 								int numRemoved = 0;
+								
 								int k = 0;
 								while (numRemoved < multiple) {
 									numRemoved += c.currentCards.remove(card + k++);
 								}
-								
 								
 								if (c.currentCards.ncards <= 0) {
 									order.add(c);
@@ -166,18 +168,30 @@ public class Server extends Thread {
 									continue;
 								}
 								
-								if (card / 4 == 0) {
+								if (card / 4 == 0) { // for bombs
 									cards = new Deck(new byte[0]);
-									broadcast(pc_bomb, Packet.longToBytes(c.id));
+									broadcast(pc_bomb, c.idbytes);
 									index -= 1;
 									lastplay = -1;
-								} else {
+								} else { // for actually playing another card
 									lastplay = index;
-									if (card / 4 == cards.topcard() / 4) {
-										index += 1;
-										broadcast(pc_skip, Packet.longToBytes(c.id));
+									if (multiple >= 2) {
+										if (multiple == 2) {
+											if (card / 4 == cards.topcard() / 4) {
+												completion(c);
+											}
+										}
+										
+									} else {
+										if (card / 4 == cards.topcard() / 4) {
+											index += 1;
+											broadcast(pc_skip, c.idbytes);
+										}
 									}
-									cards.add(card);
+									for (int i = 0; i < multiple; i++) {
+										cards.add(card);
+									}
+									
 								}
 							}
 							
@@ -193,7 +207,7 @@ public class Server extends Thread {
 					} // placing a card
 					
 					if (c.scumOut(cards.ncards == 0)) {
-						broadcast(pc_scumout, Packet.longToBytes(c.id));
+						broadcast(pc_scumout, c.idbytes);
 						ingame.remove(c);
 						scumout.add(c);
 					} // checking if they scum out
@@ -201,7 +215,7 @@ public class Server extends Thread {
 			} // game loop while
 			order.addAll(scumout);
 			for (int i = 0; i < order.size(); i++) {
-				broadcast(pc_playerpos, Packet.longToBytes(i), Packet.longToBytes(order.size()), Packet.longToBytes(order.get(i).id));
+				broadcast(pc_playerpos, Packet.longToBytes(i), Packet.longToBytes(order.size()), order.get(i).idbytes);
 			}
 			
 			
@@ -217,7 +231,7 @@ public class Server extends Thread {
 			completionClient = client;
 			client.currentCards = Deck.complete(cards, client.currentCards);
 			interrupt();
-			broadcast(pc_completion, Packet.longToBytes(client.id));
+			broadcast(pc_completion, client.idbytes);
 		} else {
 			client.outpacks.send(pc_message, "You can't complete that.".getBytes());
 		}
