@@ -206,11 +206,11 @@ public class Deck {
 		if (completeWith.ncards == 0) return false;
 		if (top.ncards == 0) return false;
 		if (completeWith.ncards + top.ncards < 4) return false;
-		int card = top.cards[top.ncards - 1];
+		int card = top.topcard();
 		int ncards = 0; // number of cards at top of deck
 		int ncardscm = 0; // number of cards in completewith deck
 		
-		for (int i = top.ncards - 1; i >= 0 && top.cards[i] / 4 == top.cards[top.ncards - 1] / 4; i--) {
+		for (int i = top.ncards - 1; i >= 0 && top.cards[i] / 4 == card / 4; i--) {
 			ncards += 1;
 		}
 		for (int c : completeWith.cards) {

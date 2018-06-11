@@ -121,6 +121,7 @@ public class Server extends Thread {
 			CopyOnWriteArrayList<SClient> scumout = new CopyOnWriteArrayList<SClient>();
 			int index = 0;
 			int lastplay = -1;
+			final int NULL = 0;
 			while (ingame.size() > 1) {
 				cards = new Deck(new byte[0]);
 				lastplay = -1;
@@ -144,7 +145,7 @@ public class Server extends Thread {
 								ingame.remove(c);
 								continue;
 							}
-							if (cards.ncards == 0) {
+							if (cards.ncards == NULL) {
 								multiple = c.getMultiple();
 							}
 							byte cardindex = c.getCardindex(topcard, multiple, cards.ncards == 0);
