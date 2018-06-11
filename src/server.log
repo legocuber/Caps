@@ -1,0 +1,14 @@
+java.net.SocketException: Connection reset
+	at java.base/java.net.SocketInputStream.read(Unknown Source)
+	at java.base/java.net.SocketInputStream.read(Unknown Source)
+	at java.base/java.net.SocketInputStream.read(Unknown Source)
+	at java.base/java.io.DataInputStream.readInt(Unknown Source)
+	at caps.Packet.nextPacket(Packet.java:96)
+	at caps.server.SClientReceiver.run(SClientReceiver.java:18)
+java.net.SocketException: Connection reset
+	at java.base/java.net.SocketInputStream.read(Unknown Source)
+	at java.base/java.net.SocketInputStream.read(Unknown Source)
+	at java.base/java.net.SocketInputStream.read(Unknown Source)
+	at java.base/java.io.DataInputStream.readInt(Unknown Source)
+	at caps.Packet.nextPacket(Packet.java:96)
+	at caps.server.SClientReceiver.run(SClientReceiver.java:18)
